@@ -4,6 +4,8 @@ import Select from "react-tailwindcss-select";
 import Link from "next/link";
 
 import themes from "@/helper";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import { setTheme, setUsername, setYear } from "@/redux/slices/stats-info";
 
 const GenerateStats = () => {
   const getThemes = () => {
@@ -31,6 +33,10 @@ const GenerateStats = () => {
     });
   };
 
+  const {username, theme, year} = useAppSelector((state) => state.statsInfo)
+  const dispatch = useAppDispatch()
+
+
   return (
     <>
       <nav className="shadow-sm py-8 px-8 md:px-4">
@@ -57,7 +63,7 @@ const GenerateStats = () => {
                   {" "}
                   Dev.to username{" "}
                 </label>
-                <Input type="text" placeholder="Dev.to Username" />
+                <Input type="text" placeholder="Dev.to Username" value={username} onChange={(e: any) => dispatch(setUsername(e.target.value)) }/>
               </div>
 
               <div className="space-y-2">
@@ -68,13 +74,13 @@ const GenerateStats = () => {
 
                 <Select
                   options={getThemes()}
-                  onChange={(value) => console.log(value)}
-                  value={null}
+                  onChange={(value) => dispatch(setTheme(value))}
+                  value={theme}
                   primaryColor={""}
                 />
               </div>
 
-              <div>
+              <div className="space-y-2">
                 <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                   {" "}
                   Choose a year{" "}
@@ -82,8 +88,8 @@ const GenerateStats = () => {
 
                 <Select
                   options={getYears()}
-                  onChange={(value) => console.log(value)}
-                  value={null}
+                  onChange={(value) => dispatch(setYear(value))}
+                  value={year}
                   primaryColor={""}
                 />
               </div>
