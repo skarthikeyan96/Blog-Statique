@@ -6,6 +6,9 @@ import Link from "next/link";
 import themes from "@/helper";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { setTheme, setUsername, setYear } from "@/redux/slices/stats-info";
+import { Button } from "@/components/ui/button"
+import React from "react";
+import axios from "axios"
 
 const GenerateStats = () => {
   const getThemes = () => {
@@ -36,7 +39,24 @@ const GenerateStats = () => {
   const {username, theme, year} = useAppSelector((state) => state.statsInfo)
   const dispatch = useAppDispatch()
 
+  const [loading, setLoading] = React.useState(false)
+  const [svgResponse, setSvgResponse] = React.useState('')
 
+
+  const fetchSvg = async () => {
+    try {
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}/api/dev?username=${username}&year=${year.value || 0}&theme=${theme.value || ""}`)
+      setLoading(true)
+      //https://stackoverflow.com/questions/23223718/failed-to-execute-btoa-on-window-the-string-to-be-encoded-contains-characte
+      const base64 = btoa(unescape(encodeURIComponent(response.data)))
+      const svgUrl = 'data:image/svg+xml;base64,' + base64
+      setSvgResponse(svgUrl)
+      setLoading(false)
+    } catch (error) {}
+  }
+
+  const generateCard = () => fetchSvg()
+ 
   return (
     <>
       <nav className="shadow-sm py-8 px-8 md:px-4">
@@ -93,7 +113,21 @@ const GenerateStats = () => {
                   primaryColor={""}
                 />
               </div>
+
+
+              <div className="space-y-2">
+              <Button variant="outline" onClick={generateCard}>Generate Card </Button>
+
+              </div>
             </div>
+          </div>
+          <div>
+          {!loading && (
+              <img
+                src={svgResponse}
+                className="w-full max-w-full h-auto border justify-center items-center"
+              />
+            )}
           </div>
         </div>
       </Container>
